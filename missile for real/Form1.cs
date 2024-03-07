@@ -16,7 +16,7 @@ namespace missile_for_real
     {
         Timer ticks = new Timer();
         Timer missileTicks = new Timer();
-        PointF mousePosition = new PointF(200,200);
+        PointF mousePosition = new PointF(0,200);
         List<Missile> missileList = new List<Missile>();
         
         public Form1()
@@ -60,7 +60,7 @@ namespace missile_for_real
         private void MissileTimer_Tick(object sender, EventArgs e)
         {
             PointF spawn = new PointF(20, 20);
-            Vector2 velocity = new Vector2(new PointF(0, 0), new PointF(20, 100));
+            Vector2 velocity = new Vector2(new PointF(0, 0), new PointF(0, 100));
             velocity.End = new PointF(10, 10);
             missileList.Add(new Missile(spawn, mousePosition, velocity, 0.06, 20, 3f, 0.5f));
             Refresh();
@@ -89,8 +89,17 @@ namespace missile_for_real
 
     public class Vector2
     {
-        public PointF End { get; set; }
-        public float Magnitude { get; }
+        private PointF end;
+        public PointF End 
+        { 
+            get { return end; } 
+            set 
+            {
+                Magnitude = (float)Math.Sqrt(Math.Pow(End.X, 2) + Math.Pow(End.Y, 2));
+                end = value;
+            } 
+        }
+        public float Magnitude { get; private set; }
 
         public Vector2(PointF start, PointF end)
         {
@@ -111,6 +120,7 @@ namespace missile_for_real
             float addedVectorY = vector1.End.Y + vector2.End.Y;
             Vector2 addedVector = new Vector2(new PointF(0,0), new PointF(addedVectorX, addedVectorY));
             return addedVector;
+            //0780
         }
 
         public static double CrossProduct(Vector2 v, Vector2 w)
@@ -170,8 +180,6 @@ namespace missile_for_real
         public PointF newPosition = new PointF(0, 0);
 
         public Stopwatch MissileTime = new Stopwatch();
-
-        public Vector2 fakeDesiredVelocity = new Vector2(new PointF(0, 0), new PointF(0, 0));
 
         Random random = new Random();
         public Missile(PointF _Position, PointF _Target, Vector2 _Velocity1, double _Drag, float _MaxSpeed, float _Randomness, float _MaxRotateAngle)
