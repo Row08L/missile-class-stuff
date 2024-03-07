@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.34407.143
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "missile for real", "missile for real\missile for real.csproj", "{B2776868-274E-452C-BC97-F18D8AD238C9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B2776868-274E-452C-BC97-F18D8AD238C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2776868-274E-452C-BC97-F18D8AD238C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2776868-274E-452C-BC97-F18D8AD238C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2776868-274E-452C-BC97-F18D8AD238C9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {07F1DA84-66E4-4074-B2A5-F320E3B03506}
+	EndGlobalSection
+EndGlobal
