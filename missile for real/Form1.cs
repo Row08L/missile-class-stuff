@@ -39,7 +39,7 @@ namespace missile_for_real
             {
                 PointF spawn = new PointF(200, 200);
                 Vector2 velocity = new Vector2(new PointF(0, 0), new PointF(20, 20));
-                missileList.Add(new Missile(spawn, mousePosition, velocity, 0.06, 10, 3f, 0.5f));
+                missileList.Add(new Missile(spawn, mousePosition, velocity, 0.06, 10, 3f, 1f));
             }
             if (e.Button == MouseButtons.Right)
             {
@@ -62,7 +62,7 @@ namespace missile_for_real
             PointF spawn = new PointF(20, 20);
             Vector2 velocity = new Vector2(new PointF(0, 0), new PointF(0, 100));
             velocity.End = new PointF(10, 10);
-            missileList.Add(new Missile(spawn, mousePosition, velocity, 0.06, 20, 3f, 0.5f));
+            missileList.Add(new Missile(spawn, mousePosition, velocity, 0.06, 20, 3f, (float)(Math.PI * 2) / 10f));
             Refresh();
         }
         protected override void OnPaint(PaintEventArgs e)
@@ -72,9 +72,9 @@ namespace missile_for_real
             Pen orange = new Pen(Color.Orange, 10);
             for (int missle1 = 0; missle1 < missileList.Count(); missle1++)
             {
-                e.Graphics.DrawLine(black, new PointF(missileList[missle1].changeVector.End.X + missileList[missle1].Position.X, missileList[missle1].changeVector.End.Y + missileList[missle1].Position.Y), missileList[missle1].Position);
-                e.Graphics.DrawLine(orange, new PointF(missileList[missle1].Velocity1.End.X + missileList[missle1].Position.X, missileList[missle1].Velocity1.End.Y + missileList[missle1].Position.Y), missileList[missle1].Position);
-                e.Graphics.DrawLine(Pens.Green, new PointF(missileList[missle1].change.End.X + missileList[missle1].Position.X, missileList[missle1].change.End.Y + missileList[missle1].Position.Y), missileList[missle1].Position);
+                //e.Graphics.DrawLine(black, new PointF(missileList[missle1].changeVector.End.X + missileList[missle1].Position.X, missileList[missle1].changeVector.End.Y + missileList[missle1].Position.Y), missileList[missle1].Position);
+                //e.Graphics.DrawLine(orange, new PointF(missileList[missle1].Velocity1.End.X + missileList[missle1].Position.X, missileList[missle1].Velocity1.End.Y + missileList[missle1].Position.Y), missileList[missle1].Position);
+                //e.Graphics.DrawLine(Pens.Green, new PointF(missileList[missle1].change.End.X + missileList[missle1].Position.X, missileList[missle1].change.End.Y + missileList[missle1].Position.Y), missileList[missle1].Position);
                 e.Graphics.FillEllipse(Brushes.Black, new RectangleF(missileList[missle1].Position.X, missileList[missle1].Position.Y, 10, 10));
                 e.Graphics.FillEllipse(Brushes.Blue, new RectangleF(missileList[missle1].Target.X, missileList[missle1].Target.Y, 10, 10));
                 
@@ -217,11 +217,11 @@ namespace missile_for_real
                 {
                     //the random thing
                 }
-                if(crossProduct < 0)
+                if(crossProduct > 0)
                 {
                     currentMissile.changeVector.End = RotatePoint(currentMissile.changeVector.End, new PointF(0, 0), -(currentMissile.MaxRotateAngle - angleBetween));
                 }
-                else if(crossProduct > 0)
+                else if(crossProduct < 0)
                 {
                     currentMissile.changeVector.End = RotatePoint(currentMissile.changeVector.End, new PointF(0,0), currentMissile.MaxRotateAngle - angleBetween);
                 }
