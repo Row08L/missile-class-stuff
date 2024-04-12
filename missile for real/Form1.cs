@@ -39,7 +39,7 @@ namespace missile_for_real
             KeyDown += Form1_KeyDown;
             KeyUp += Form1_KeyUp;
             missileTicks.Start();
-            player1 = new Player(new PointF(0, 0), new Vector2(new PointF(0, 0), new PointF(0, -1)), 1, 25, (float)Math.PI / 64, (float)0.3);
+            player1 = new Player(new PointF(0, 0), new Vector2(new PointF(0, 0), new PointF(0, -1)), 0.1, 32, (float)Math.PI / 64, (float)0.5);
             playerCam = new Camera(player1.Position, new SizeF(this.Width, this.Height));
             
         }
@@ -104,7 +104,10 @@ namespace missile_for_real
                 missileList[missle1] = Missile.UpdateMissilePosition(missileList[missle1]);
                 missileList[missle1] = Missile.RandomizeMissilePosition(missileList[missle1]);
             }
-            playerCam.SetPosition(player1.Position.X, player1.Position.Y);
+            playerCam.SetPosition(player1.Position.X - this.Width / 2, player1.Position.Y - this.Height / 2);
+            Bitmap formBitmap = new Bitmap(this.ClientSize.Width, this.ClientSize.Height);
+            this.DrawToBitmap(formBitmap, new Rectangle(0, 0, this.ClientSize.Width, this.ClientSize.Height));
+            playerCam.UpdateCamera(formBitmap);
             Refresh();
         }
         private void MissileTimer_Tick(object sender, EventArgs e)
@@ -125,10 +128,15 @@ namespace missile_for_real
                 //e.Graphics.DrawLine(black, new PointF(missileList[missle1].changeVector.End.X + missileList[missle1].Position.X, missileList[missle1].changeVector.End.Y + missileList[missle1].Position.Y), missileList[missle1].Position);
                 //e.Graphics.DrawLine(orange, new PointF(missileList[missle1].Velocity1.End.X + missileList[missle1].Position.X, missileList[missle1].Velocity1.End.Y + missileList[missle1].Position.Y), missileList[missle1].Position);
                 //e.Graphics.DrawLine(Pens.Green, new PointF(missileList[missle1].change.End.X + missileList[missle1].Position.X, missileList[missle1].change.End.Y + missileList[missle1].Position.Y), missileList[missle1].Position);
-                e.Graphics.FillEllipse(Brushes.Black, new RectangleF(missileList[missle1].Position.X - playerCam.Position.X + this.Width / 2, missileList[missle1].Position.Y - playerCam.Position.Y + this.Height / 2, 10, 10));
+                e.Graphics.FillEllipse(Brushes.Black, new RectangleF(missileList[missle1].Position.X , missileList[missle1].Position.Y, 10, 10));
                 //e.Graphics.FillEllipse(Brushes.Blue, new RectangleF(missileList[missle1].Target.X, missileList[missle1].Target.Y, 10, 10));
-                e.Graphics.FillEllipse(Brushes.Blue, new RectangleF(this.Width / 2, this.Height / 2, 10, 10));
-                e.Graphics.DrawLine(Pens.Green, new PointF(this.Width / 2, this.Height / 2), new PointF((this.Width / 2) + player1.CurrentDircetion.End.X, (this.Height / 2) + player1.CurrentDircetion.End.Y));
+                e.Graphics.FillEllipse(Brushes.Blue, new RectangleF(player1.Position.X, player1.Position.Y, 10, 10));
+                e.Graphics.DrawLine(Pens.Green, player1.Position, new PointF(player1.Position.X + player1.CurrentDircetion.End.X, player1.Position.Y + player1.CurrentDircetion.End.Y));
+            }
+            
+            if (playerCam.ViewpostBitmap != null)
+            {
+                e.Graphics.DrawImage(playerCam.ViewpostBitmap, new PointF(0, 0));
             }
         }
         //private void CursorPositionForm_MouseMove(object sender, MouseEventArgs e)
@@ -334,12 +342,15 @@ namespace missile_for_real
     {
         public PointF Position { get; set; }
         public SizeF ViewportSize { get; set; }
+
+        public Bitmap ViewpostBitmap { get; private set; }
         public RectangleF Viewport => new RectangleF(Position, ViewportSize);
 
         public Camera(PointF position, SizeF viewportSize)
         {
             Position = position;
             ViewportSize = viewportSize;
+            ViewpostBitmap = new Bitmap((int)viewportSize.Width, (int)viewportSize.Height);
         }
 
         public void Move(float dx, float dy)
@@ -352,6 +363,27 @@ namespace missile_for_real
             Position = new PointF(x, y);
         }
 
+        public void UpdateCamera(Bitmap formBitmap)
+        {
+            // Dispose of the previous bitmap if it exists
+            if (ViewpostBitmap != null)
+            {
+                ViewpostBitmap.Dispose();
+            }
+
+            // Create a new bitmap for the viewport
+            ViewpostBitmap = new Bitmap((int)ViewportSize.Width, (int)ViewportSize.Height);
+
+            // Capture the contents of the form's bitmap within the viewport
+            using (Graphics g = Graphics.FromImage(ViewpostBitmap))
+            {
+                // Calculate the source rectangle within the form's bitmap
+                Rectangle sourceRect = new Rectangle((int)Position.X, (int)Position.Y, (int)ViewportSize.Width, (int)ViewportSize.Height);
+
+                // Draw the section of the form's bitmap onto the viewport bitmap
+                g.DrawImage(formBitmap, 0, 0, sourceRect, GraphicsUnit.Pixel);
+            }
+        }
 
         // Other methods needed, such as zooming, resetting position, etc.
     }
@@ -391,7 +423,11 @@ namespace missile_for_real
         
         public void MovePlayer ( bool wDown, bool aDown, bool sDown, bool dDown)
         {
-            //CurrentVelocity = Vector2.VectorAddition(CurrentVelocity, new Vector2(new PointF(0, 0), LineScaler(new PointF(0, 0), CurrentVelocity.End, (float)-Drag)));
+            if (CurrentVelocity.Magnitude > 0)
+            {
+                CurrentVelocity = Vector2.VectorAddition(CurrentVelocity, new Vector2(new PointF(0, 0), LineScaler(new PointF(0, 0), CurrentVelocity.End, (float)-Drag)));
+            }
+
             float rotateAngle = MaxRotateAngle;
             if (wDown == true)
             {
@@ -408,13 +444,13 @@ namespace missile_for_real
                     }
                 }
 
-                if (CurrentVelocity.Magnitude > 5)
+                if (CurrentVelocity.Magnitude > 7)
                 {
                     CurrentVelocity = Vector2.VectorAddition(CurrentVelocity, new Vector2(new PointF(0, 0), LineScaler(new PointF(0, 0), CurrentDircetion.End, Acceleration)));
                 }
-                if (Vector2.AngleBetween(CurrentVelocity, CurrentDircetion) > Math.PI / 3)
+                else
                 {
-                    CurrentVelocity = Vector2.VectorAddition(CurrentVelocity, new Vector2(new PointF(0, 0), LineScaler(new PointF(0, 0), CurrentDircetion.End, 5)));
+                    CurrentVelocity = Vector2.VectorAddition(CurrentVelocity, new Vector2(new PointF(0, 0), LineScaler(new PointF(0, 0), CurrentDircetion.End, 7)));
                 }
                 
             }
